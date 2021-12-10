@@ -12,6 +12,7 @@ import jax
 import jax.numpy as jnp
 from jax_cfd.base import array_utils
 from jax_cfd.base import boundaries
+from jax_cfd.base import finite_differences
 from jax_cfd.base import grids
 from jax_cfd.ml import physics_specifications
 from jax_cfd.ml import towers
@@ -130,5 +131,29 @@ def latent_encoder(
     inputs = stack_inputs_fn(inputs)
     encoder_tower = tower_factory(num_latent_dims, grid.ndim, name='encoder')
     return encoder_tower(inputs)
+
+  return encode_fn
+
+
+@gin.configurable
+def spectral_vorticity_encoder(
+    grid: grids.Grid,
+    dt: float,
+    physics_specs: physics_specifications.BasePhysicsSpecs,
+    data_offsets: Optional[Tuple[Tuple[float, ...], ...]] = None,
+) -> EncodeFn:
+  """Generates encoder that wraps last data slice as GridVariables."""
+  del dt, physics_specs  # unused.
+  data_offsets = data_offsets or grid.cell_faces
+  slice_last_fn = lambda x: array_utils.slice_along_axis(x, 0, -1)
+
+  def encode_fn(inputs):
+    has_time_dim = len(inputs[0].shape) == 3
+    if has_time_dim:
+      last_times = tuple(slice_last_fn(x) for x in inputs)
+    else:
+      last_times = inputs
+    vorticity = finite_differences.curl_2d(last_times)
+    return jnp.fft.rfft2(vorticity.data)
 
   return encode_fn

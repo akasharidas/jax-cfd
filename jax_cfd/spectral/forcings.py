@@ -17,9 +17,11 @@
 import jax.numpy as jnp
 from jax_cfd.base import grids
 from jax_cfd.spectral import types as spectral_types
+import gin
 
 
 # pylint: disable=unused-argument
+@gin.register
 def kolmogorov_forcing_fn(grid: grids.Grid,
                           state: spectral_types.Array) -> spectral_types.Array:
   """Constant Kolmogorov forcing function."""

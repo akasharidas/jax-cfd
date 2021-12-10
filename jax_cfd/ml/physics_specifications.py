@@ -6,8 +6,8 @@ PhysicsSpecs objects using `get_physics_specs`, which should be
 configured appropriately.
 """
 
-from typing import Optional
 import dataclasses
+from typing import Optional
 import gin
 
 from jax_cfd.ml import forcings
@@ -40,3 +40,11 @@ class NavierStokesPhysicsSpecs(BasePhysicsSpecs):
   """Configurable physical parameters and modules for Navier-Stokes models."""
   density: float
   viscosity: float
+
+
+@gin.configurable
+@dataclasses.dataclass
+class SpectralNavierStokesPhysicsSpecs(BasePhysicsSpecs):
+  viscosity: float
+  drag: float
+  smooth: bool

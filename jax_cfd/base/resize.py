@@ -104,3 +104,20 @@ def downsample_staggered_velocity(
       downsample = downsample_staggered_velocity_component
     result.append(downsample(u, j, round(factor)))
   return tuple(result)
+
+
+def downsample_vorticity_hat(_: grids.Grid,
+                             destination_grid: grids.Grid,
+                             signal_hat):
+  """Downsamples a 2D signal in the Fourier basis to the `destination_grid`."""
+  kx, ky = destination_grid.rfft_axes()
+  (num_x,), (num_y,) = kx.shape, ky.shape
+
+  input_num_x, _ = signal_hat.shape
+
+  downed = jnp.concatenate(
+      [signal_hat[:num_x // 2, :num_y], signal_hat[-num_x // 2:, :num_y]])
+
+  scale = (num_x / input_num_x)
+  downed *= scale**2
+  return downed
