@@ -19,6 +19,7 @@ from typing import Optional, Sequence, Tuple
 from jax_cfd.base import grids
 from jax_cfd.base import interpolation
 import numpy as np
+import jax.numpy as jnp
 
 AlignedArray = grids.AlignedArray
 Tensor = grids.Tensor
