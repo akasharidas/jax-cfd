@@ -1,6 +1,6 @@
 """Configurable optimizers from JAX."""
 import gin
-from jax.example_libraries import optimizers
+from jax.experimental import optimizers
 
 
 @gin.configurable
